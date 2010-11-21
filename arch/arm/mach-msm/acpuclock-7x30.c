@@ -79,48 +79,102 @@ struct clkctl_acpu_speed {
 static struct clock_state drv_state = { 0 };
 
 static struct cpufreq_frequency_table freq_table[] = {
-	{ 0, 245760 },
-	{ 1, 368640 },
-	{ 2, 768000 },
-	{ 3, 806400 },
-	{ 4, 1017600 },
-	{ 5, 1113600 },
-	{ 6, 1209600 },
-	{ 7, 1305600 },
-	{ 8, 1401600 },
-	{ 9, 1497600 },
-	{ 10, CPUFREQ_TABLE_END },
-	/* Just an example of some of the insanity I was able to pull off on my
-	   device */
-	//{ 8, 1612800 },
-	//{ 9, 1708800 },
-	//{ 10, CPUFREQ_TABLE_END },
+        { 0, 245760 },
+        { 1, 368640 },
+        { 2, 768000 },
+        { 3, 806400 },
+        { 4, 825600 },
+        { 5, 844800 },
+        { 6, 864000 },
+        { 7, 883200 },
+        { 8, 902400 },
+        { 9, 921600 },
+        { 10, 940800 },
+        { 11, 960000 },
+        { 12, 979200 },
+        { 13, 998400 },
+        { 14, 1017600 },
+        { 15, 1036800 },
+        { 16, 1056000 },
+        { 17, 1075200 },
+        { 18, 1094400 },
+        { 19, 1113600 },
+	{ 20, 1132800 },
+	{ 21, 1152000 },
+	{ 22, 1171200 },
+	{ 23, 1190400 },
+        { 24, 1209600 },
+	{ 25, 1228800 },
+	{ 27, 1248000 },
+	{ 28, 1248000 },
+	{ 29, 1267200 },
+	{ 30, 1286400 },
+        { 31, 1305600 },
+	{ 32, 1324800 },
+	{ 33, 1344000 },
+	{ 34, 1363200 },
+	{ 35, 1382400 },
+        { 36, 1401600 },
+        { 37, 1420800 },
+        { 38, 1440000 },
+        { 39, 1459200 },
+        { 40, 1478400 },
+        { 41, 1497600 },
+        { 42, 1516800 },
+        { 43, CPUFREQ_TABLE_END },
 };
 
 /* Use negative numbers for sources that can't be enabled/disabled */
 #define SRC_LPXO (-2)
 #define SRC_AXI  (-1)
 static struct clkctl_acpu_speed acpu_freq_tbl[] = {
-	{ 24576,  SRC_LPXO, 0, 0,  30720,  1000, VDD_RAW(1000) },
-	{ 61440,  PLL_3,    5, 11, 61440,  1000, VDD_RAW(1000) },
-	{ 122880, PLL_3,    5, 5,  61440,  1000, VDD_RAW(1000) },
-	{ 184320, PLL_3,    5, 4,  61440,  1000, VDD_RAW(1000) },
-	{ MAX_AXI_KHZ, SRC_AXI, 1, 0, 61440, 1000, VDD_RAW(1000) },
-	{ 245760, PLL_3,    5, 2,  61440,  1000, VDD_RAW(1000) },
-	{ 368640, PLL_3,    5, 1,  122800, 1050, VDD_RAW(1050) },
-	{ 768000, PLL_1,    2, 0,  153600, 1100, VDD_RAW(1100) },
-	/* Make sure any freq based from PLL_2 is a multiple of 19200! 
-	   Voltage tables are being very conservative and are not designed to
-	   be an undervolt of any sort. */
-	{ 806400, PLL_2,    3, 0,  192000, 1100, VDD_RAW(1100) },
-	{ 1017600, PLL_2,   3, 0,  192000, 1200, VDD_RAW(1200) },
-	{ 1113600, PLL_2,   3, 0,  192000, 1200, VDD_RAW(1200) },
-	{ 1209600, PLL_2,   3, 0,  192000, 1200, VDD_RAW(1200) },
-	{ 1305600, PLL_2,   3, 0,  192000, 1200, VDD_RAW(1200) },
-	{ 1401600, PLL_2,   3, 0,  192000, 1300, VDD_RAW(1300) },
-	{ 1497600, PLL_2,   3, 0,  192000, 1300, VDD_RAW(1300) },
-	//{ 1612800, PLL_2,   3, 0,  192000, 1400, VDD_RAW(1400) },
-	//{ 1708800, PLL_2,   3, 0,  192000, 1400, VDD_RAW(1400) },
+        { 24576,  SRC_LPXO, 0, 0,  30720,  750, VDD_RAW(750) },
+        { 61440,  PLL_3,    5, 11, 61440,  775, VDD_RAW(775) },
+        { 122880, PLL_3,    5, 5,  61440,  800, VDD_RAW(800) },
+        { 184320, PLL_3,    5, 4,  61440,  825, VDD_RAW(825) },
+        { MAX_AXI_KHZ, SRC_AXI, 1, 0, 61440, 850, VDD_RAW(850) },
+        { 245760, PLL_3,    5, 2,  61440,  850, VDD_RAW(850) },
+        { 368640, PLL_3,    5, 1,  122800, 875, VDD_RAW(875) },
+        { 768000, PLL_1,    2, 0,  153600, 950, VDD_RAW(950) },
+	/* Make sure any freq based from PLL_2 is a multiple of 19200! */
+        { 806400, PLL_2,    3, 0,  192000, 975, VDD_RAW(975) },
+        { 825600, PLL_2,    3, 0,  192000, 975, VDD_RAW(975) },
+        { 844800, PLL_2,    3, 0,  192000, 975, VDD_RAW(975) },
+        { 864000, PLL_2,    3, 0,  192000, 975, VDD_RAW(975) },
+        { 883200, PLL_2,    3, 0,  192000, 1000, VDD_RAW(1000) },
+        { 902400, PLL_2,    3, 0,  192000, 1000, VDD_RAW(1000) },
+        { 921600, PLL_2,    3, 0,  192000, 1000, VDD_RAW(1000) },
+        { 940800, PLL_2,    3, 0,  192000, 1000, VDD_RAW(1000) },
+        { 960000, PLL_2,    3, 0,  192000, 1000, VDD_RAW(1000) },
+        { 979200, PLL_2,    3, 0,  192000, 1025, VDD_RAW(1025) },
+        { 998400, PLL_2,    3, 0,  192000, 1050, VDD_RAW(1050) },
+        { 1017600, PLL_2,   3, 0,  192000, 1050, VDD_RAW(1050) },
+        { 1036800, PLL_2,   3, 0,  192000, 1050, VDD_RAW(1050) },
+        { 1056000, PLL_2,   3, 0,  192000, 1050, VDD_RAW(1050) },
+        { 1075200, PLL_2,   3, 0,  192000, 1050, VDD_RAW(1050) },
+        { 1094400, PLL_2,   3, 0,  192000, 1075, VDD_RAW(1075) },
+        { 1113600, PLL_2,   3, 0,  192000, 1075, VDD_RAW(1075) },
+        { 1132800, PLL_2,   3, 0,  192000, 1075, VDD_RAW(1075) },
+        { 1152000, PLL_2,   3, 0,  192000, 1075, VDD_RAW(1075) },
+        { 1171200, PLL_2,   3, 0,  192000, 1100, VDD_RAW(1100) },
+        { 1190400, PLL_2,   3, 0,  192000, 1125, VDD_RAW(1125) },
+        { 1209600, PLL_2,   3, 0,  192000, 1150, VDD_RAW(1150) },
+        { 1228800, PLL_2,   3, 0,  192000, 1150, VDD_RAW(1150) },
+        { 1248000, PLL_2,   3, 0,  192000, 1150, VDD_RAW(1150) },
+        { 1267200, PLL_2,   3, 0,  192000, 1150, VDD_RAW(1150) },
+        { 1286400, PLL_2,   3, 0,  192000, 1150, VDD_RAW(1175) },
+        { 1305600, PLL_2,   3, 0,  192000, 1175, VDD_RAW(1175) },
+        { 1324800, PLL_2,   3, 0,  192000, 1175, VDD_RAW(1175) },
+        { 1344000, PLL_2,   3, 0,  192000, 1175, VDD_RAW(1175) },
+        { 1363200, PLL_2,   3, 0,  192000, 1200, VDD_RAW(1200) },
+        { 1382400, PLL_2,   3, 0,  192000, 1225, VDD_RAW(1225) },
+        { 1401600, PLL_2,   3, 0,  192000, 1250, VDD_RAW(1250) },
+        { 1420800, PLL_2,   3, 0,  192000, 1250, VDD_RAW(1250) },
+        { 1440000, PLL_2,   3, 0,  192000, 1250, VDD_RAW(1250) },
+        { 1459200, PLL_2,   3, 0,  192000, 1250, VDD_RAW(1250) },
+        { 1478400, PLL_2,   3, 0,  192000, 1275, VDD_RAW(1275) },
+        { 1497600, PLL_2,   3, 0,  192000, 1275, VDD_RAW(1275) },
+        { 1516800, PLL_2,   3, 0,  192000, 1275, VDD_RAW(1275) },
 	{ 0 }
 };
 static unsigned long max_axi_rate;
@@ -340,11 +394,11 @@ static unsigned int acpuclk_get_current_vdd(void)
 	unsigned int vdd_mv;
 
 	vdd_raw = msm_spm_get_vdd();
-	for (vdd_mv = 750; vdd_mv <= 1350; vdd_mv += 25)
+	for (vdd_mv = 750; vdd_mv <= 1275; vdd_mv += 25)
 		if (VDD_RAW(vdd_mv) == vdd_raw)
 			break;
 
-	if (vdd_mv > 1350)
+	if (vdd_mv > 1275)
 		return 0;
 
 	return vdd_mv;
@@ -363,7 +417,7 @@ static int acpuclk_update_freq_tbl(unsigned int acpu_khz, unsigned int acpu_vdd)
 		pr_err("%s: acpuclk invalid speed %d\n", __func__, acpu_khz);
 		return -1;
 	}
-	if (acpu_vdd > 1350 || acpu_vdd < 750) {
+	if (acpu_vdd > 1275 || acpu_vdd < 750) {
 		pr_err("%s: acpuclk vdd out of ranage, %d\n",
 			__func__, acpu_vdd);
 		return -2;
