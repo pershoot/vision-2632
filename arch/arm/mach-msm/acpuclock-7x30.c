@@ -128,13 +128,13 @@ static struct cpufreq_frequency_table freq_table[] = {
 #define SRC_LPXO (-2)
 #define SRC_AXI  (-1)
 static struct clkctl_acpu_speed acpu_freq_tbl[] = {
-        { 24576,  SRC_LPXO, 0, 0,  30720,  750, VDD_RAW(750) },
-        { 61440,  PLL_3,    5, 11, 61440,  775, VDD_RAW(775) },
-        { 122880, PLL_3,    5, 5,  61440,  800, VDD_RAW(800) },
-        { 184320, PLL_3,    5, 4,  61440,  825, VDD_RAW(825) },
-        { MAX_AXI_KHZ, SRC_AXI, 1, 0, 61440, 850, VDD_RAW(850) },
-        { 245760, PLL_3,    5, 2,  61440,  850, VDD_RAW(850) },
-        { 368640, PLL_3,    5, 1,  122800, 875, VDD_RAW(875) },
+        { 24576,  SRC_LPXO, 0, 0,  30720,  800, VDD_RAW(800) },
+        { 61440,  PLL_3,    5, 11, 61440,  825, VDD_RAW(825) },
+        { 122880, PLL_3,    5, 5,  61440,  850, VDD_RAW(850) },
+        { 184320, PLL_3,    5, 4,  61440,  875, VDD_RAW(875) },
+        { MAX_AXI_KHZ, SRC_AXI, 1, 0, 61440, 900, VDD_RAW(900) },
+        { 245760, PLL_3,    5, 2,  61440,  900, VDD_RAW(900) },
+        { 368640, PLL_3,    5, 1,  122800, 925, VDD_RAW(925) },
         { 768000, PLL_1,    2, 0,  153600, 950, VDD_RAW(950) },
 	/* Make sure any freq based from PLL_2 is a multiple of 19200! */
         { 806400, PLL_2,    3, 0,  192000, 975, VDD_RAW(975) },
