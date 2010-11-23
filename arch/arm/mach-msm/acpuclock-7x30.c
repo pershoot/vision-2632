@@ -48,7 +48,7 @@
 #define VREG_CONFIG  (BIT(7) | BIT(6)) /* Enable VREG, pull-down if disabled. */
 /* Cause a compile error if the voltage is not a multiple of the step size. */
 #define MV(mv)      ((mv) / (!((mv) % V_STEP)))
-/* mv = (750mV + (raw * 25mV)) * (2 - VREF_SEL) */
+/* mv = (800mV + (raw * 25mV)) * (2 - VREF_SEL) */
 #define VDD_RAW(mv) (((MV(mv) / V_STEP) - 30) | VREG_DATA)
 
 #define MAX_AXI_KHZ 192000
@@ -394,7 +394,7 @@ static unsigned int acpuclk_get_current_vdd(void)
 	unsigned int vdd_mv;
 
 	vdd_raw = msm_spm_get_vdd();
-	for (vdd_mv = 750; vdd_mv <= 1275; vdd_mv += 25)
+	for (vdd_mv = 800; vdd_mv <= 1275; vdd_mv += 25)
 		if (VDD_RAW(vdd_mv) == vdd_raw)
 			break;
 
@@ -417,7 +417,7 @@ static int acpuclk_update_freq_tbl(unsigned int acpu_khz, unsigned int acpu_vdd)
 		pr_err("%s: acpuclk invalid speed %d\n", __func__, acpu_khz);
 		return -1;
 	}
-	if (acpu_vdd > 1275 || acpu_vdd < 750) {
+	if (acpu_vdd > 1275 || acpu_vdd < 800) {
 		pr_err("%s: acpuclk vdd out of ranage, %d\n",
 			__func__, acpu_vdd);
 		return -2;
