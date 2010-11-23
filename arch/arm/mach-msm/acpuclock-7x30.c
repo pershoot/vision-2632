@@ -48,7 +48,7 @@
 #define VREG_CONFIG  (BIT(7) | BIT(6)) /* Enable VREG, pull-down if disabled. */
 /* Cause a compile error if the voltage is not a multiple of the step size. */
 #define MV(mv)      ((mv) / (!((mv) % V_STEP)))
-/* mv = (800mV + (raw * 25mV)) * (2 - VREF_SEL) */
+/* mv = (750mV + (raw * 25mV)) * (2 - VREF_SEL) */
 #define VDD_RAW(mv) (((MV(mv) / V_STEP) - 30) | VREG_DATA)
 
 #define MAX_AXI_KHZ 192000
