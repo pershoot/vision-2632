@@ -128,14 +128,14 @@ static struct cpufreq_frequency_table freq_table[] = {
 #define SRC_LPXO (-2)
 #define SRC_AXI  (-1)
 static struct clkctl_acpu_speed acpu_freq_tbl[] = {
-        { 24576,  SRC_LPXO, 0, 0,  30720,  800, VDD_RAW(800) },
-        { 61440,  PLL_3,    5, 11, 61440,  825, VDD_RAW(825) },
-        { 122880, PLL_3,    5, 5,  61440,  850, VDD_RAW(850) },
-        { 184320, PLL_3,    5, 4,  61440,  875, VDD_RAW(875) },
-        { MAX_AXI_KHZ, SRC_AXI, 1, 0, 61440, 900, VDD_RAW(900) },
-        { 245760, PLL_3,    5, 2,  61440,  900, VDD_RAW(900) },
-        { 368640, PLL_3,    5, 1,  122800, 925, VDD_RAW(925) },
-        { 768000, PLL_1,    2, 0,  153600, 950, VDD_RAW(950) },
+        { 24576,  SRC_LPXO, 0, 0,  30720,  825, VDD_RAW(825) },
+        { 61440,  PLL_3,    5, 11, 61440,  850, VDD_RAW(850) },
+        { 122880, PLL_3,    5, 5,  61440,  875, VDD_RAW(875) },
+        { 184320, PLL_3,    5, 4,  61440,  900, VDD_RAW(900) },
+        { MAX_AXI_KHZ, SRC_AXI, 1, 0, 61440, 925, VDD_RAW(925) },
+        { 245760, PLL_3,    5, 2,  61440,  925, VDD_RAW(925) },
+        { 368640, PLL_3,    5, 1,  122800, 950, VDD_RAW(950) },
+        { 768000, PLL_1,    2, 0,  153600, 975, VDD_RAW(975) },
 	/* Make sure any freq based from PLL_2 is a multiple of 19200! */
         { 806400, PLL_2,    3, 0,  192000, 975, VDD_RAW(975) },
         { 825600, PLL_2,    3, 0,  192000, 975, VDD_RAW(975) },
@@ -394,7 +394,7 @@ static unsigned int acpuclk_get_current_vdd(void)
 	unsigned int vdd_mv;
 
 	vdd_raw = msm_spm_get_vdd();
-	for (vdd_mv = 800; vdd_mv <= 1275; vdd_mv += 25)
+	for (vdd_mv = 825; vdd_mv <= 1275; vdd_mv += 25)
 		if (VDD_RAW(vdd_mv) == vdd_raw)
 			break;
 
@@ -417,7 +417,7 @@ static int acpuclk_update_freq_tbl(unsigned int acpu_khz, unsigned int acpu_vdd)
 		pr_err("%s: acpuclk invalid speed %d\n", __func__, acpu_khz);
 		return -1;
 	}
-	if (acpu_vdd > 1275 || acpu_vdd < 800) {
+	if (acpu_vdd > 1275 || acpu_vdd < 825) {
 		pr_err("%s: acpuclk vdd out of ranage, %d\n",
 			__func__, acpu_vdd);
 		return -2;
