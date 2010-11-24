@@ -30,6 +30,15 @@
  * It helps to keep variable names smaller, simpler
  */
 
+#if defined (CONFIG_ARCH_MSM7230)
+#define DEF_FREQUENCY_DOWN_DIFFERENTIAL         (10)
+#define DEF_FREQUENCY_UP_THRESHOLD              (80)
+#define MICRO_FREQUENCY_DOWN_DIFFERENTIAL       (3)
+#define MICRO_FREQUENCY_UP_THRESHOLD            (90)
+#define MICRO_FREQUENCY_MIN_SAMPLE_RATE         (9750)
+#define MIN_FREQUENCY_UP_THRESHOLD              (11)
+#define MAX_FREQUENCY_UP_THRESHOLD              (100)
+#else
 #define DEF_FREQUENCY_DOWN_DIFFERENTIAL		(10)
 #define DEF_FREQUENCY_UP_THRESHOLD		(80)
 #define MICRO_FREQUENCY_DOWN_DIFFERENTIAL	(3)
@@ -37,6 +46,7 @@
 #define MICRO_FREQUENCY_MIN_SAMPLE_RATE		(10000)
 #define MIN_FREQUENCY_UP_THRESHOLD		(11)
 #define MAX_FREQUENCY_UP_THRESHOLD		(100)
+#endif
 
 /*
  * The polling frequency of this governor depends on the capability of
