@@ -120,8 +120,7 @@ static struct cpufreq_frequency_table freq_table[] = {
         { 39, 1459200 },
         { 40, 1478400 },
         { 41, 1497600 },
-        { 42, 1516800 },
-        { 43, CPUFREQ_TABLE_END },
+        { 42, CPUFREQ_TABLE_END },
 };
 
 /* Use negative numbers for sources that can't be enabled/disabled */
@@ -131,16 +130,16 @@ static struct clkctl_acpu_speed acpu_freq_tbl[] = {
         { 24576,  SRC_LPXO, 0, 0,  30720,  850, VDD_RAW(850) },
         { 61440,  PLL_3,    5, 11, 61440,  900, VDD_RAW(900) },
         { 122880, PLL_3,    5, 5,  61440,  950, VDD_RAW(950) },
-        { 184320, PLL_3,    5, 4,  61440,  950, VDD_RAW(950) },
-        { MAX_AXI_KHZ, SRC_AXI, 1, 0, 61440, 975, VDD_RAW(975) },
-        { 245760, PLL_3,    5, 2,  61440,  975, VDD_RAW(975) },
-        { 368640, PLL_3,    5, 1,  122800, 975, VDD_RAW(975) },
-        { 768000, PLL_1,    2, 0,  153600, 975, VDD_RAW(975) },
+        { 184320, PLL_3,    5, 4,  61440,  975, VDD_RAW(975) },
+        { MAX_AXI_KHZ, SRC_AXI, 1, 0, 61440, 1000, VDD_RAW(1000) },
+        { 245760, PLL_3,    5, 2,  61440,  1000, VDD_RAW(1000) },
+        { 368640, PLL_3,    5, 1,  122800, 1000, VDD_RAW(1000) },
+        { 768000, PLL_1,    2, 0,  153600, 1000, VDD_RAW(1000) },
 	/* Make sure any freq based from PLL_2 is a multiple of 19200! */
-        { 806400, PLL_2,    3, 0,  192000, 975, VDD_RAW(975) },
-        { 825600, PLL_2,    3, 0,  192000, 975, VDD_RAW(975) },
-        { 844800, PLL_2,    3, 0,  192000, 975, VDD_RAW(975) },
-        { 864000, PLL_2,    3, 0,  192000, 975, VDD_RAW(975) },
+        { 806400, PLL_2,    3, 0,  192000, 1000, VDD_RAW(1000) },
+        { 825600, PLL_2,    3, 0,  192000, 1000, VDD_RAW(1000) },
+        { 844800, PLL_2,    3, 0,  192000, 1000, VDD_RAW(1000) },
+        { 864000, PLL_2,    3, 0,  192000, 1000, VDD_RAW(1000) },
         { 883200, PLL_2,    3, 0,  192000, 1000, VDD_RAW(1000) },
         { 902400, PLL_2,    3, 0,  192000, 1000, VDD_RAW(1000) },
         { 921600, PLL_2,    3, 0,  192000, 1000, VDD_RAW(1000) },
@@ -174,7 +173,6 @@ static struct clkctl_acpu_speed acpu_freq_tbl[] = {
         { 1459200, PLL_2,   3, 0,  192000, 1250, VDD_RAW(1250) },
         { 1478400, PLL_2,   3, 0,  192000, 1275, VDD_RAW(1275) },
         { 1497600, PLL_2,   3, 0,  192000, 1275, VDD_RAW(1275) },
-        { 1516800, PLL_2,   3, 0,  192000, 1275, VDD_RAW(1275) },
 	{ 0 }
 };
 static unsigned long max_axi_rate;
