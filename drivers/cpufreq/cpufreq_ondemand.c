@@ -669,6 +669,7 @@ static inline void dbs_timer_exit(struct cpu_dbs_info_s *dbs_info)
 	cancel_delayed_work_sync(&dbs_info->work);
 }
 
+#ifdef CONFIG_CPU_FREQ_GOV_ONDEMAND_INPUT
 static void dbs_refresh_callback(struct work_struct *unused)
 {
 	struct cpufreq_policy *policy;
@@ -764,6 +765,7 @@ static struct input_handler dbs_input_handler = {
 	.name		= "cpufreq_ond",
 	.id_table	= dbs_ids,
 };
+#endif
 
 static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 				   unsigned int event)
@@ -829,7 +831,9 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 				max(min_sampling_rate,
 				    latency * LATENCY_MULTIPLIER);
 		}
+#ifdef CONFIG_CPU_FREQ_GOV_ONDEMAND_INPUT
 		rc = input_register_handler(&dbs_input_handler);
+#endif
 		mutex_unlock(&dbs_mutex);
 
 		mutex_init(&this_dbs_info->timer_mutex);
@@ -843,7 +847,9 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 		sysfs_remove_group(&policy->kobj, &dbs_attr_group_old);
 		mutex_destroy(&this_dbs_info->timer_mutex);
 		dbs_enable--;
+#ifdef CONFIG_CPU_FREQ_GOV_ONDEMAND_INPUT
 		input_unregister_handler(&dbs_input_handler);
+#endif
 		mutex_unlock(&dbs_mutex);
 		if (!dbs_enable)
 			sysfs_remove_group(cpufreq_global_kobject,
