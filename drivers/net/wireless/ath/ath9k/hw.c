@@ -912,6 +912,8 @@ int ath9k_hw_init(struct ath_hw *ah)
 	ath9k_hw_init_defaults(ah);
 	ath9k_hw_init_config(ah);
 
+	ath9k_hw_read_revisions(ah);
+
 	if (!ath9k_hw_set_reset_reg(ah, ATH9K_RESET_POWER_ON)) {
 		DPRINTF(ah->ah_sc, ATH_DBG_FATAL, "Couldn't reset chip\n");
 		return -EIO;
@@ -1742,8 +1744,6 @@ static bool ath9k_hw_set_reset_power_on(struct ath_hw *ah)
 		DPRINTF(ah->ah_sc, ATH_DBG_RESET, "RTC not waking up\n");
 		return false;
 	}
-
-	ath9k_hw_read_revisions(ah);
 
 	return ath9k_hw_set_reset(ah, ATH9K_RESET_WARM);
 }
