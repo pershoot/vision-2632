@@ -903,6 +903,11 @@ config USB_ACCESSORY_DETECT_BY_ADC
 	depends on USB_ANDROID && USB_ACCESSORY_DETECT
 	default n
 
+config DOCK_ACCESSORY_DETECT
+        boolean "DOCK ACCESSORY DETECT"
+        depends on USB_ANDROID
+        default n
+
 config USB_BYPASS_VBUS_NOTIFY
         boolean "USB BYPASS VBUS NOTIFY"
         depends on USB_ANDROID
