@@ -266,7 +266,8 @@ int gpio_event_input_func(struct gpio_event_input_devs *input_devs,
 	di = container_of(info, struct gpio_event_input_info, info);
 
 	if (func == GPIO_EVENT_FUNC_SUSPEND) {
-		irq_status = gpio_event_get_phone_call_status() & 0x01;
+               irq_status = (gpio_event_get_phone_call_status() & 0x01) ||
+                             (gpio_event_get_fm_radio_status() & 0x01);
 		pr_info("%s: set irq_status = %d\n", __func__, irq_status);
 
 		if (ds->use_irq)

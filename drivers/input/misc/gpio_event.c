@@ -20,6 +20,30 @@
 #include <linux/hrtimer.h>
 #include <linux/platform_device.h>
 
+static unsigned char fm_radio_status;
+
+int gpio_event_get_fm_radio_status(void)
+{
+        return fm_radio_status;
+}
+
+static ssize_t fm_radio_store(struct device *dev,
+                                         struct device_attribute *attr,
+                                         const char *buf, size_t count)
+{
+        fm_radio_status = simple_strtoull(buf, NULL, 10);
+        pr_info("GPIO_EVENT:: fm_radio_status=%d\n", fm_radio_status);
+
+        return count;
+}
+static ssize_t fm_radio_show(struct device *dev,
+                                        struct device_attribute *attr, char *buf)
+{
+        return sprintf(buf, "fm_radio_status:%d\n", fm_radio_status);
+}
+
+static DEVICE_ATTR(fm_radio, 0666, fm_radio_show, fm_radio_store);
+
 struct gpio_event {
 	struct gpio_event_input_devs *input_devs;
 	const struct gpio_event_platform_data *info;
@@ -215,6 +239,10 @@ static int __init gpio_event_probe(struct platform_device *pdev)
 		registered++;
 	}
 
+	err = device_create_file(&(pdev->dev), &dev_attr_fm_radio);
+	if (err)
+		pr_err("%s: Unable create fm_radio attribute file\n", __func__);
+
 	return 0;
 
 err_input_register_device_failed:
@@ -253,6 +281,9 @@ static int gpio_event_remove(struct platform_device *pdev)
 	for (i = 0; i < ip->input_devs->count; i++)
 		input_unregister_device(ip->input_devs->dev[i]);
 	kfree(ip);
+
+	device_remove_file(&(pdev->dev), &dev_attr_fm_radio);
+
 	return 0;
 }
 

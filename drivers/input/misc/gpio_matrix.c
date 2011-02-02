@@ -313,6 +313,7 @@ int gpio_event_matrix_func(struct gpio_event_input_devs *input_devs,
 	int err;
 	int key_count;
 	int phone_call_status;
+        int fm_radio_status;
 	int irq;
 	static int irq_status = 1;
 	struct gpio_kp *kp;
@@ -326,10 +327,11 @@ int gpio_event_matrix_func(struct gpio_event_input_devs *input_devs,
 			return 0;
 
 		phone_call_status = gpio_event_get_phone_call_status() & 0x01;
-		pr_info("%s: mi->ninputs: %d, func&0x01 = %d, phone_call_status=%d\n", __func__, mi->ninputs, func & 0x01, phone_call_status);
+		fm_radio_status = gpio_event_get_fm_radio_status() & 0x01;
+                pr_info("%s: mi->ninputs: %d, func&0x01 = %d, phone_call_status=%d, fm_radio_status=%d\n", __func__, mi->ninputs, func & 0x01, phone_call_status, fm_radio_status);
 
-		if (irq_status != ((func & 0x01) | phone_call_status)) {
-			irq_status = ((func & 0x01) | phone_call_status);
+		if (irq_status != ((func & 0x01) | phone_call_status | fm_radio_status)) {
+			irq_status = ((func & 0x01) | phone_call_status | fm_radio_status);
 			pr_info("%s: irq_status %d \n", __func__, irq_status);
 		} else {
 			pr_info("%s: irq_status %d, did not change\n", __func__, irq_status);
