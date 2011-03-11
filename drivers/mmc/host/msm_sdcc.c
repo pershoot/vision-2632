@@ -36,6 +36,7 @@
 #include <linux/debugfs.h>
 #include <linux/io.h>
 #include <linux/memory.h>
+#include <linux/suspend.h>
 
 #include <asm/cacheflush.h>
 #include <asm/div64.h>
@@ -139,6 +140,13 @@ static int is_mmc_platform(struct mmc_platform_data *plat)
 		return 1;
 
 	return 0;
+}
+
+int is_mmc_host(struct mmc_card *card)
+{
+	struct msmsdcc_host *host = mmc_priv(card->host);
+
+	return is_mmc_platform(host->plat);
 }
 
 static int is_svlte_platform(struct mmc_platform_data *plat)
@@ -1082,6 +1090,36 @@ msmsdcc_handle_irq_data(struct msmsdcc_host *host, u32 status,
 	}
 }
 
+/* Try to recover from spurious IRQ */
+static void msmsdcc_resolve_bad_irq(struct msmsdcc_host *host)
+{
+	struct mmc_command *cmd = host->curr.cmd;
+	struct mmc_data *data = host->curr.data;
+	printk(KERN_INFO "%s: %s\n", mmc_hostname(host->mmc),
+		__func__);
+
+	if (!host->curr.mrq) {
+		msmsdcc_reset_and_restore(host);
+		return;
+	}
+
+	if (cmd)
+		cmd->error = -EIO;
+
+	if (data && host->dma.sg) {
+		data->error = -EFAULT;
+		msm_dmov_stop_cmd(host->dma.channel,
+			  &host->dma.hdr, 0);
+	} else {
+		msmsdcc_reset_and_restore(host);
+		if (data) {
+			data->error = -EIO;
+			msmsdcc_stop_data(host);
+		}
+		msmsdcc_request_end(host, host->curr.mrq);
+	}
+}
+
 static irqreturn_t
 msmsdcc_irq(int irq, void *dev_id)
 {
@@ -1090,8 +1128,14 @@ msmsdcc_irq(int irq, void *dev_id)
 	u32			status;
 	int			ret = 0;
 	int			cardint = 0;
+	static unsigned int	irq_count;
+	static unsigned long last_unhandled;
+	static unsigned int	irqs_unhandled;
 
 	spin_lock(&host->lock);
+
+	if ((is_sd_platform(host->plat) || is_mmc_platform(host->plat)) && (++irq_count == 99900))
+		irq_count = 0;
 
 	do {
 		status = msmsdcc_readl(host, MMCISTATUS);
@@ -1108,8 +1152,25 @@ msmsdcc_irq(int irq, void *dev_id)
 #if IRQ_DEBUG
 		msmsdcc_print_status(host, "irq0-p", status);
 #endif
-		if (!status)
+		if ((is_sd_platform(host->plat) || is_mmc_platform(host->plat)) && (irq_count == 0)) {
+			if (irqs_unhandled > 99800) {
+				msmsdcc_resolve_bad_irq(host);
+				irqs_unhandled = 0;
+				break;
+			}
+			irqs_unhandled = 0;
+		}
+
+		if (!status) {
+			if ((is_sd_platform(host->plat) || is_mmc_platform(host->plat)) && !ret) {
+				if (time_after(jiffies, last_unhandled + HZ/10))
+					irqs_unhandled = 1;
+				else
+					irqs_unhandled++;
+				last_unhandled = jiffies;
+			}
 			break;
+		}
 
 		msmsdcc_handle_irq_data(host, status, base);
 
@@ -1195,6 +1256,11 @@ msmsdcc_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 
 	msmsdcc_enable_clocks(host);
 
+#ifdef CONFIG_ARCH_MSM7X30
+	/* radio does not support 26MHz, so change it to 25MHz */
+	if (ios->clock == 26000000)
+		ios->clock = 25000000;
+#endif
 	if (ios->clock) {
 		if (ios->clock != host->clk_rate) {
 			rc = clk_set_rate(host->clk, ios->clock);
@@ -1636,6 +1702,8 @@ msmsdcc_probe(struct platform_device *pdev)
 
 	mmc_set_drvdata(pdev, mmc);
 	mmc_add_host(mmc);
+	if (is_sd_platform(host->plat))
+		register_pm_notifier(&mmc->pm_notify);
 
 #ifdef CONFIG_HAS_EARLYSUSPEND
 	host->early_suspend.suspend = msmsdcc_early_suspend;
