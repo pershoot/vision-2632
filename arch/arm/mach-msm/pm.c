@@ -328,13 +328,6 @@ void msm_fiq_exit_sleep(void);
 static inline void msm_fiq_exit_sleep(void) { }
 #endif
 
-#ifdef CONFIG_HTC_POWER_COLLAPSE_MAGIC
-/* Set magic number in SMEM for power collapse state */
-#define HTC_POWER_COLLAPSE_ADD	(MSM_SHARED_RAM_BASE + 0x000F8000 + 0x000007F8)
-#define HTC_POWER_COLLAPSE_MAGIC_NUM	(HTC_POWER_COLLAPSE_ADD - 0x04)
-unsigned int magic_num;
-#endif
-
 static int msm_sleep(int sleep_mode, uint32_t sleep_delay, int from_idle)
 {
 	uint32_t saved_vector[2];
@@ -477,10 +470,7 @@ static int msm_sleep(int sleep_mode, uint32_t sleep_delay, int from_idle)
 			clk_set_rate(axi_clk, sleep_axi_rate);
 #endif
 	}
-#ifdef CONFIG_HTC_POWER_COLLAPSE_MAGIC
-	magic_num = 0xAAAA1111;
-	writel(magic_num, HTC_POWER_COLLAPSE_MAGIC_NUM);
-#endif
+
 	if (sleep_mode < MSM_PM_SLEEP_MODE_APPS_SLEEP) {
 		if (msm_pm_debug_mask & MSM_PM_DEBUG_SMSM_STATE)
 			smsm_print_sleep_info(0);
@@ -530,10 +520,7 @@ static int msm_sleep(int sleep_mode, uint32_t sleep_delay, int from_idle)
 		msm_arch_idle();
 		rv = 0;
 	}
-#ifdef CONFIG_HTC_POWER_COLLAPSE_MAGIC
-	magic_num = 0xBBBB9999;
-	writel(magic_num, HTC_POWER_COLLAPSE_MAGIC_NUM);
-#endif
+
 	if (sleep_mode <= MSM_PM_SLEEP_MODE_RAMP_DOWN_AND_WAIT_FOR_INTERRUPT) {
 		if (msm_pm_debug_mask & MSM_PM_DEBUG_CLOCK)
 			printk(KERN_INFO "msm_sleep(): exit power collapse %ld"

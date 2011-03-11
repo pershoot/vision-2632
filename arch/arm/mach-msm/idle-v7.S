@@ -104,6 +104,9 @@ ENTRY(msm_pm_collapse_exit)
 
 	bl	__cpu_early_init
 
+.globl _cpu_early_init_complete
+_cpu_early_init_complete:
+
 	ldr     r1, =saved_state_end
 	ldr     r2, =msm_pm_collapse_exit
 	adr     r3, msm_pm_collapse_exit
