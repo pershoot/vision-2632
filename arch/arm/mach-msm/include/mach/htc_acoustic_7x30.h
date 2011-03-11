@@ -19,7 +19,9 @@ struct acoustic_ops {
 	void (*enable_mic_bias)(int en, int shift);
 	int (*support_audience)(void);
 	int (*support_aic3254) (void);
+	int (*support_back_mic) (void);
 	void (*mic_disable) (int mic);
+	void (*mute_headset_amp) (int en);
 };
 
 void acoustic_register_ops(struct acoustic_ops *ops);

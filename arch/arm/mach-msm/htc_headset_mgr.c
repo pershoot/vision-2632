@@ -368,11 +368,11 @@ static void remove_headset(void)
 		queue_delayed_work(detect_wq, &detect_h2w_work,
 				   HS_DELAY_ZERO_JIFFIES);
 	} else {
-		state &= ~MASK_35MM_HEADSET;
+		state &= ~(MASK_35MM_HEADSET | MASK_FM_ATTRIBUTE);
 		switch_set_state(&hi->sdev, state);
 	}
 #else
-	state &= ~MASK_35MM_HEADSET;
+	state &= ~(MASK_35MM_HEADSET | MASK_FM_ATTRIBUTE);
 	switch_set_state(&hi->sdev, state);
 #endif
 

@@ -566,7 +566,7 @@ static int snddev_icodec_open(struct msm_snddev_info *dev_info)
 			if ((icodec->data->dev_vol_type & (
 				SNDDEV_DEV_VOL_DIGITAL |
 				SNDDEV_DEV_VOL_ANALOG)))
-				rc = snddev_icodec_set_device_volume_impl(
+				snddev_icodec_set_device_volume_impl(
 						dev_info, dev_info->dev_volume);
 		}
 		mutex_unlock(&drv->rx_lock);
@@ -584,7 +584,7 @@ static int snddev_icodec_open(struct msm_snddev_info *dev_info)
 			if ((icodec->data->dev_vol_type & (
 				SNDDEV_DEV_VOL_DIGITAL |
 				SNDDEV_DEV_VOL_ANALOG)))
-				rc = snddev_icodec_set_device_volume_impl(
+				snddev_icodec_set_device_volume_impl(
 						dev_info, dev_info->dev_volume);
 		}
 		mutex_unlock(&drv->tx_lock);
