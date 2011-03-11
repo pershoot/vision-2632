@@ -472,7 +472,7 @@ static ssize_t microp_mobeam_send_store(struct device *dev,
 				   const char *buf, size_t count)
 {
 	uint8_t data[2];
-	unsigned char num;
+	char num;
 	int ret;
 
 pr_info("%s\n", __func__);
