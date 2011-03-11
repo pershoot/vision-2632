@@ -59,7 +59,7 @@ unsigned int g_unblank_stage = 0;
 #define SONYWVGA_BR_DEF_USER_PWM         143
 #define SONYWVGA_BR_MIN_USER_PWM         30
 #define SONYWVGA_BR_MAX_USER_PWM         255
-#define SONYWVGA_BR_DEF_PANEL_PWM        153
+#define SONYWVGA_BR_DEF_PANEL_PWM        128
 #define SONYWVGA_BR_MIN_PANEL_PWM        8
 #define SONYWVGA_BR_MAX_PANEL_PWM        255
 #define SONYWVGA_BR_DEF_PANEL_UP_PWM    132

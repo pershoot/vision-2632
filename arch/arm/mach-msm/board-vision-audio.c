@@ -105,7 +105,7 @@ static unsigned aux_pcm_gpio_off[] = {
 void vision_snddev_poweramp_on(int en)
 {
 	pr_info("%s %d\n", __func__, en);
-	if (en)
+	if (en) 
 		mdelay(30);
 	gpio_set_value(PM8058_GPIO_PM_TO_SYS(VISION_AUD_SPK_ENO), en);
 }
@@ -209,10 +209,20 @@ int vision_support_audience(void)
 {
 	unsigned int engineerID = vision_get_engineerid();
 	pr_info("%s: engineerid: %x", __func__, engineerID);
-	/*Bit2:
+	/*
+	PCB A version:without Audience.
+	Bit2:
 	0: with audience.
 	1: without audience*/
-	return engineerID & 0x4 ? 0 : 1;
+	if (system_rev == 0x8)
+		return 0;
+	else
+		return engineerID & 0x4 ? 0 : 1;
+}
+
+int vision_support_back_mic(void)
+{
+	return vision_support_audience();
 }
 
 void vision_mic_disable(int mic)
@@ -253,6 +263,7 @@ static struct q5v2voice_ops vops = {
 static struct acoustic_ops acoustic = {
 	.enable_mic_bias = vision_mic_bias_enable,
 	.support_audience = vision_support_audience,
+	.support_back_mic = vision_support_back_mic,
 	.mic_disable = vision_mic_disable,
 };
 
