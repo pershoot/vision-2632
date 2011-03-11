@@ -484,7 +484,7 @@ static struct adie_codec_dev_profile ifmradio_headset_profile = {
 };
 
 static struct snddev_icodec_data snddev_ifmradio_headset_data = {
-	.capability = (SNDDEV_CAP_RX | SNDDEV_CAP_VOICE),
+	.capability = (SNDDEV_CAP_RX | SNDDEV_CAP_FM),
 	.name = "fmradio_headset_rx",
 	.copp_id = 0,
 	.acdb_id = ACDB_ID_HEADSET_SPKR_STEREO,
@@ -492,8 +492,7 @@ static struct snddev_icodec_data snddev_ifmradio_headset_data = {
 	.channel_mode = 2,
 	.default_sample_rate = 48000,
 	/* change to raise ncp power. capless need ncp bias. */
-	.pamp_on = headset_enable,
-	.vol_idx = Q5V2_HW_HEADSET
+	.pamp_on = fm_headset_enable,
 };
 
 static struct platform_device msm_ifmradio_headset_device = {
