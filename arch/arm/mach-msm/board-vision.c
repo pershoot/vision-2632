@@ -128,7 +128,8 @@ static int phy_init_seq[] = { 0x06, 0x36, 0x0C, 0x31, 0x31, 0x32, 0x1, 0x0D, 0x1
 static struct msm_hsusb_platform_data msm_hsusb_pdata = {
 	.phy_init_seq		= phy_init_seq,
 	.phy_reset		= msm_hsusb_phy_reset,
-	.usb_id_pin_gpio  = VISION_GPIO_USB_ID_PIN,
+	.usb_id_pin_gpio	= VISION_GPIO_USB_ID_PIN,
+	.accessory_detect	= 1
 };
 
 static struct usb_mass_storage_platform_data mass_storage_pdata = {
@@ -427,6 +428,26 @@ static struct a1026_platform_data a1026_data = {
        /*.gpio_a1026_int = PASSIONC_AUD_A1026_INT,*/
 };
 
+static uint32_t proximity_on_gpio_table[] = {
+	PCOM_GPIO_CFG(VISION_GPIO_PROXIMITY_INT_N,
+			0, GPIO_INPUT, GPIO_NO_PULL, 0), /* PS_VOUT */
+};
+
+static uint32_t proximity_off_gpio_table[] = {
+	PCOM_GPIO_CFG(VISION_GPIO_PROXIMITY_INT_N,
+			0, GPIO_INPUT, GPIO_PULL_DOWN, 0) /* PS_VOUT */
+};
+
+void config_vision_proximity_gpios(int on)
+{
+	if (on)
+		config_gpio_table(proximity_on_gpio_table,
+				ARRAY_SIZE(proximity_on_gpio_table));
+	else
+		config_gpio_table(proximity_off_gpio_table,
+				ARRAY_SIZE(proximity_off_gpio_table));
+}
+
 static int __capella_cm3602_power(int on)
 {
 	int rc;
@@ -441,6 +462,7 @@ static int __capella_cm3602_power(int on)
 		__func__, (on) ? "on" : "off");
 
 	if (on) {
+		config_vision_proximity_gpios(1);
 		gpio_set_value(PM8058_GPIO_PM_TO_SYS(
 				VISION_GPIO_PROXIMITY_EN), 1);
 		rc = vreg_enable(vreg);
@@ -452,6 +474,7 @@ static int __capella_cm3602_power(int on)
 			printk(KERN_ERR "%s: vreg disable failed\n", __func__);
 		gpio_set_value(PM8058_GPIO_PM_TO_SYS(
 				VISION_GPIO_PROXIMITY_EN), 0);
+		config_vision_proximity_gpios(0);
 	}
 
 	return rc;
@@ -2227,6 +2250,16 @@ static struct platform_device android_pmem_kernel_ebi1_devices = {
 	.dev = {.platform_data = &android_pmem_kernel_ebi1_pdata },
 };
 
+static void config_vision_emmc_gpios(void)
+{
+	uint32_t emmc_gpio_table[] = {
+		PCOM_GPIO_CFG(VISION_GPIO_EMMC_RST, 0, GPIO_OUTPUT,
+				GPIO_NO_PULL, GPIO_8MA),
+	};
+	config_gpio_table(emmc_gpio_table,
+			ARRAY_SIZE(emmc_gpio_table));
+}
+
 static void config_vision_flashlight_gpios(void)
 {
 	static uint32_t flashlight_gpio_table[] = {
@@ -2691,7 +2724,9 @@ static void __init vision_init(void)
 	vision_add_usb_devices();
 #endif
 	if (board_emmc_boot()) {
+#if defined(CONFIG_MSM_RMT_STORAGE_SERVER)
 		rmt_storage_add_ramfs();
+#endif
 		create_proc_read_entry("emmc", 0, NULL, emmc_partition_read_proc, NULL);
 	} else
 		platform_device_register(&msm_device_nand);
@@ -2700,6 +2735,7 @@ static void __init vision_init(void)
 	vision_ssbi_pmic_init();
 #endif
 
+	config_vision_emmc_gpios();     /* for emmc gpio reset test */
 	ret = vision_init_mmc(system_rev);
 	if (ret != 0)
 		pr_crit("%s: Unable to initialize MMC\n", __func__);
