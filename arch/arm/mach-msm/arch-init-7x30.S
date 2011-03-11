@@ -194,8 +194,8 @@ WRITE_L1_SA_SETTINGS:
         // (Raptor V2 and earlier, or Halcyon V1)
         MRC    p15, 0, r1, c0, c0, 0      //; MIDR
         BIC    r2, r1, #0xf0              //; check for Halcyon V1
-        LDR    r3, =0x511f0000
-        CMP    r2, r3
+        LDR    r4, =0x511f0000            //; don't use r3 as it keeps WCP15_PVR2F1
+        CMP    r2, r4                     //; use r4 instead
         BNE    PVR2F1
 
 DPRC:
@@ -313,7 +313,7 @@ WRITE_L2_SA_SETTINGS:
         LDR     r5, =0
 
         //; routine complete
-        BX      LR
+        B       _cpu_early_init_complete
 
 .ltorg
 
@@ -416,6 +416,12 @@ __cpu_early_init:
         DSB
         ISB
 
+        //; Setup CCPR - Cache Coherency Policy Register
+        //; setup CCPR[L1ISHP, L2ISHP] both to 0b00 (no forcing)
+        //; setup CCPR[L1OSHP, L2OSHP] both to 0b10 (force non-cacheable)
+        MOVW   r2, #0x88
+        MCR    p15, 0, r2, c10, c4, 2
+
         //;-------------------------------------------------------------------
         //; There are a number of registers that must be set prior to enabling
         //; the MMU. The DCAR is one of these registers. We are setting
@@ -459,15 +465,15 @@ SYSI2:
 
         //; Make sure Link stack is initialized with branch and links to sequential addresses
         //; This aids in creating a predictable startup environment
-//;       BL      SEQ1
-//;SEQ1:  BL      SEQ2
-//;SEQ2:  BL      SEQ3
-//;SEQ3:  BL      SEQ4
-//;SEQ4:  BL      SEQ5
-//;SEQ5:  BL      SEQ6
-//;SEQ6:  BL      SEQ7
-//;SEQ7:  BL      SEQ8
-//;SEQ8:
+        BL      SEQ1
+SEQ1:   BL      SEQ2
+SEQ2:   BL      SEQ3
+SEQ3:   BL      SEQ4
+SEQ4:   BL      SEQ5
+SEQ5:   BL      SEQ6
+SEQ6:   BL      SEQ7
+SEQ7:   BL      SEQ8
+SEQ8:
 
         //; REMOVE FOLLOWING THREE INSTRUCTIONS WHEN POWER COLLAPSE IS ENA
         //;Make sure the DBGOSLSR[LOCK] bit is cleared to allow access to the debug registers

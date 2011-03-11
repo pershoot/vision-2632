@@ -394,10 +394,6 @@ config HTC_PWRSINK
 	default y
 	bool "HTC Power Sink Driver"
 
-config HTC_POWER_COLLAPSE_MAGIC
-	default n
-	bool "Check Power Collapse State"
-
 config MSM_SPM
 	bool "Subsystem Power Manager"
 	depends on ARCH_MSM7X30
@@ -667,6 +663,14 @@ config MSM_ONCRPCROUTER
 	  Support for the MSM ONCRPC router for communication between
 	  the ARM9 and ARM11
 
+config MSM_ONCRPCROUTER_DEBUG
+	depends on MSM_ONCRPCROUTER
+	default y
+	bool "MSM debug ONCRPC router support"
+	help
+	  Support for debugging the ONCRPC router for communication
+	  between the ARM9 and ARM11
+
 if QCT_LTE
 choice
 	prompt "MSM Shared memory interface version"
@@ -769,14 +773,6 @@ config MSM_SDIO_CTL_DEBUG
 	help
 	  Support for debugging the SDIO Control Driver
 
-config MSM_ONCRPCROUTER_DEBUG
-	depends on MSM_ONCRPCROUTER
-	default y
-	bool "MSM debug ONCRPC router support"
-	help
-	  Support for debugging the ONCRPC router for communication
-	  between the ARM9 and ARM11
-
 config MSM_RPC_LOOPBACK_XPRT
 	depends on MSM_ONCRPCROUTER
 	default n
@@ -823,6 +819,23 @@ config MSM_RMT_STORAGE_SERVER
 	help
 	  Provide RPC mechanism for remote processors to access storage
 	  device on apps processor.
+
+config MSM_RMT_STORAGE_CLIENT
+	depends on (ARCH_MSM && MSM_ONCRPCROUTER)
+	depends on !MSM_RMT_STORAGE_SERVER
+	default n
+	bool "Remote Storage RPC client"
+	help
+	  Provide RPC mechanism for remote processors to access storage
+	  device on apps processor.
+
+config MSM_RMT_STORAGE_CLIENT_STATS
+	depends on (MSM_RMT_STORAGE_CLIENT && DEBUG_FS)
+	default n
+	bool "Remote storage RPC client performance statistics"
+	help
+	  Collects performance statistics and shows this information
+	  through a debugfs file rmt_storage_stats.
 
 config MSM_DALRPC
 	bool "DAL RPC support"
@@ -1088,6 +1101,13 @@ config AXI_SCREEN_POLICY
 	default n
 	help
 		Simple AXI scaling based on screen ON/OFF and PWRC.
+
+config SMD_OFFSET_NEGATE_CLIENT_STAT
+	depends on MSM_SMD
+	hex "SMD offset of negate clinet stat"
+	default 0x0
+	help
+	  TCXO shutdown retry conuter and negate tcxoc client counters.
 
 config MSM_NPA
 	bool "Node Power Architecture(NPA) support"

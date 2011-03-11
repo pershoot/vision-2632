@@ -1170,6 +1170,8 @@ int smd_core_init(void)
 		state = smem_item(SMEM_SMSM_SHARED_STATE, &size);
 		if (size == SMSM_V1_SIZE || size == SMSM_V2_SIZE) {
 			smd_info.state = (unsigned)state;
+			pr_info("phy addr of smd_info.state=0x%X\n",
+				MSM_SHARED_RAM_PHYS + (smd_info.state -	(uint32_t)MSM_SHARED_RAM_BASE));
 			break;
 		}
 	}
