@@ -29,6 +29,9 @@
 #define DEBUG			(0)
 #define ENABLE_DIAG_IOCTLS	(1)
 
+/* support at most 1024 set of commands */
+#define PARAM_MAX		sizeof(char) * 6 * 1024
+
 static struct i2c_client *this_client;
 static struct a1026_platform_data *pdata;
 
@@ -38,7 +41,7 @@ static struct mutex a1026_lock;
 static int a1026_opened;
 static int a1026_suspended;
 static int control_a1026_clk;
-static unsigned int a1026_NS_state = A1026_NS_STATE_AUTO;
+static int a1026_NS_state = A1026_NS_STATE_AUTO;
 static int a1026_current_config = A1026_PATH_SUSPEND;
 static int a1026_param_ID;
 static char *config_data;
@@ -552,7 +555,7 @@ int build_cmds(char* cmds, int newid)
 	}
 	return offset;
 }
-int a1026_set_config(char newid, int mode)
+int a1026_set_config(int newid, int mode)
 {
 	int rc = 0, size = 0;
 	int number_of_cmd_sets, rd_retry_cnt;
@@ -689,10 +692,10 @@ int a1026_set_config(char newid, int mode)
 	{
 		int i = 0;
 		for (i = 1; i <= size; i++) {
-		pr_info("%x ", *(i2c_cmds + i - 1));
+			pr_info("%x ", *(i2c_cmds + i - 1));
 			if ( !(i % 4))
 				pr_info("\n");
-	        }
+		}
 	}
 #endif
 
@@ -911,7 +914,7 @@ a1026_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 	int mic_sel = 0;
 #endif
 	int pathid = 0;
-	unsigned int ns_state;
+	int ns_state;
 
 	switch (cmd) {
 	case A1026_BOOTUP_INIT:
@@ -924,6 +927,8 @@ a1026_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 	case A1026_SET_CONFIG:
 		if (copy_from_user(&pathid, argp, sizeof(pathid)))
 			return -EFAULT;
+		if (pathid < 0 || pathid >= A1026_PATH_MAX)
+			return -EINVAL;
 		rc = a1026_set_config(pathid, A1026_CONFIG_FULL);
 		if (rc < 0)
 			pr_err("%s: A1026_SET_CONFIG (%d) error %d!\n",
@@ -948,12 +953,18 @@ a1026_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 			return -EFAULT;
 		}
 
-		if (cfg.data_len <= 0) {
-				pr_err("%s: invalid data length %d\n", __func__,  cfg.data_len);
-				return -EINVAL;
+		if (cfg.data_len <= 0 || cfg.data_len > PARAM_MAX) {
+			pr_err("%s: invalid data length %d\n", __func__,  cfg.data_len);
+			return -EINVAL;
 		}
 
-		config_data = kmalloc(cfg.data_len, GFP_KERNEL);
+		if (cfg.cmd_data == NULL) {
+			pr_err("%s: invalid data\n", __func__);
+			return -EINVAL;
+		}
+
+		if (config_data == NULL)
+			config_data = kmalloc(cfg.data_len, GFP_KERNEL);
 		if (!config_data) {
 			pr_err("%s: out of memory\n", __func__);
 			return -ENOMEM;
@@ -961,6 +972,7 @@ a1026_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 		if (copy_from_user(config_data, cfg.cmd_data, cfg.data_len)) {
 			pr_err("%s: copy data from user failed.\n", __func__);
 			kfree(config_data);
+			config_data = NULL;
 			return -EFAULT;
 		}
 		a1026_cmds_len = cfg.data_len;
