@@ -96,6 +96,8 @@ static struct switch_dev dock_switch = {
 #define DOCK_STATE_UNDOCKED     0
 #define DOCK_STATE_DESK         (1 << 0)
 #define DOCK_STATE_CAR          (1 << 1)
+
+#define DOCK_DET_DELAY		HZ/2
 #endif
 
 #include <linux/wakelock.h>
@@ -225,7 +227,7 @@ struct usb_info {
 	struct work_struct work;
 	struct delayed_work chg_work;
 	struct work_struct detect_work;
-	struct work_struct dock_work;
+	struct delayed_work dock_work;
 	struct work_struct notifier_work;
 	unsigned phy_status;
 	unsigned phy_fail_count;
@@ -1414,7 +1416,7 @@ static void usb_prepare(struct usb_info *ui)
 #endif
 #ifdef CONFIG_DOCK_ACCESSORY_DETECT
 	if (ui->dock_detect) {
-		INIT_WORK(&ui->dock_work, dock_detect_work);
+		INIT_DELAYED_WORK(&ui->dock_work, dock_detect_work);
 		dock_detect_init(ui);
 	}
 #endif
@@ -1714,16 +1716,15 @@ static irqreturn_t dock_interrupt(int irq, void *data)
 {
 	struct usb_info *ui = data;
 	disable_irq_nosync(ui->dockpin_irq);
-	queue_work(ui->usb_wq, &ui->dock_work);
+	queue_delayed_work(ui->usb_wq, &ui->dock_work, DOCK_DET_DELAY);
 	return IRQ_HANDLED;
 }
 static void dock_detect_work(struct work_struct *w)
 {
-	struct usb_info *ui = container_of(w, struct usb_info, dock_work);
+	struct usb_info *ui = container_of(w, struct usb_info, dock_work.work);
 	int value;
 
 	value = gpio_get_value(ui->dock_pin_gpio);
-
 	if (value == 0 && vbus) {
 		set_irq_type(ui->dockpin_irq, IRQF_TRIGGER_HIGH);
 		switch_set_state(&dock_switch, DOCK_STATE_DESK);
@@ -1749,7 +1750,7 @@ static void dock_detect_init(struct usb_info *ui)
 		ui->dockpin_irq = gpio_to_irq(ui->dock_pin_gpio);
 
 	ret = request_irq(ui->dockpin_irq, dock_interrupt,
-				IRQF_TRIGGER_LOW,
+				IRQF_TRIGGER_LOW | IRQF_DISABLED,
 				"dock_irq", ui);
 	if (ret < 0) {
 		printk(KERN_ERR "%s: request_irq failed\n", __func__);
@@ -2165,22 +2166,30 @@ void msm_hsusb_set_vbus_state(int online)
 				/*configure uart pin to alternate function*/
 				if (ui->serial_debug_gpios)
 					ui->serial_debug_gpios(1);
-#ifdef CONFIG_DOCK_ACCESSORY_DETECT
-				if (ui->accessory_type == 3) {
-					set_irq_type(ui->dockpin_irq, IRQF_TRIGGER_LOW);
-					switch_set_state(&dock_switch, DOCK_STATE_UNDOCKED);
-					ui->accessory_type = 0;
-					printk(KERN_INFO "usb:dock: vbus offline\n");
-					enable_irq(ui->dockpin_irq);
-				}
-#endif
 			}
 
 			queue_work(ui->usb_wq, &ui->work);
 		}
 	}
-	if (ui)
+	if (ui) {
 		spin_unlock_irqrestore(&ui->lock, flags);
+#ifdef CONFIG_DOCK_ACCESSORY_DETECT
+		if (ui->dock_detect) {
+			if (vbus)
+				enable_irq(ui->dockpin_irq);
+			else {
+				disable_irq_nosync(ui->dockpin_irq);
+				if (cancel_delayed_work_sync(&ui->dock_work)){
+					enable_irq(ui->dockpin_irq);
+				}
+				if (ui->accessory_type == 3) {
+					disable_irq_nosync(ui->dockpin_irq);
+					queue_delayed_work(ui->usb_wq, &ui->dock_work, 0);
+				}
+			}
+		}
+#endif
+	}
 }
 
 #if defined(CONFIG_DEBUG_FS) && 0
