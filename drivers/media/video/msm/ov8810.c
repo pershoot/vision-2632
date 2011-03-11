@@ -904,7 +904,7 @@ static int ov8810_i2c_read_fuseid(struct sensor_cfg_data *cdata)
 static int32_t ov8810_af_i2c_write(uint16_t data)
 {
 	uint8_t code_val_msb, code_val_lsb; /* S3_to_0; */
-	uint32_t rc = 0;
+	int32_t rc = 0;
 	/* S3_to_0 = 0x9;  S[3:0] */
 	code_val_msb = data >> 4; /* D[9:4] */
 	code_val_lsb = ((data & 0x000F) << 4) | S3_to_0;
@@ -1788,8 +1788,7 @@ static int32_t ov8810_setting(int rt)
 		break;
 
 	case FULL_SIZE:
-		if (rc < 0)
-			return rc;
+
 		array_length = sizeof(ov8810_full_settings_array) /
 			sizeof(ov8810_full_settings_array[0]);
 		/* Configure sensor for QXGA capture mode */
@@ -2129,9 +2128,7 @@ static int ov8810_sensor_open_init(struct msm_camera_sensor_info *data)
 	pr_info("%s, generate test pattern, %d, rc=%d\n",
 		__func__, __LINE__, rc);
 
-	if (rc < 0)
-		goto init_fail;
-	else
+	if (rc >= 0)
 		goto init_done;
 	    /* reset the driver state */
 init_fail:
@@ -2194,8 +2191,12 @@ probe_failure:
 
 static int ov8810_probe_init_done(const struct msm_camera_sensor_info *data)
 {
-	gpio_request(data->sensor_pwd, "ov8810");
-	gpio_direction_output(data->sensor_pwd, 1);
+	int rc;
+	rc = gpio_request(data->sensor_pwd, "ov8810");
+	if (!rc)
+		gpio_direction_output(data->sensor_pwd, 1);
+	else
+		pr_err("GPIO (%d) request faile\n", data->sensor_pwd);
 	gpio_free(data->sensor_pwd);
 	mdelay(1);
 	return 0;
@@ -2539,12 +2540,12 @@ int ov8810_sensor_config(void __user *argp)
 		case CFG_SET_DEFAULT_FOCUS:
 			rc =
 				ov8810_set_default_focus(
-					cdata.cfg.focus.steps);
+					(uint8_t)cdata.cfg.focus.steps);
 			break;
 
 		case CFG_SET_EFFECT:
 			rc = ov8810_set_default_focus(
-						cdata.cfg.effect);
+					(uint8_t)cdata.cfg.effect);
 			break;
 
 		case CFG_I2C_IOCTL_R_OTP:{
@@ -2588,6 +2589,15 @@ static int ov8810_sensor_release(void)
 	gpio_request(ov8810_ctrl->sensordata->sensor_pwd, "ov8810");
 	gpio_direction_output(ov8810_ctrl->sensordata->sensor_pwd, 1);
 	gpio_free(ov8810_ctrl->sensordata->sensor_pwd);
+
+	if (ov8810_ctrl) {
+		rc = gpio_request(ov8810_ctrl->sensordata->sensor_pwd, "ov8810");
+		if (!rc)
+			gpio_direction_output(ov8810_ctrl->sensordata->sensor_pwd, 1);
+		else
+			pr_err("GPIO (%d) request faile\n", ov8810_ctrl->sensordata->sensor_pwd);
+		gpio_free(ov8810_ctrl->sensordata->sensor_pwd);
+	}
 
 	pr_info("vreg_af_actuator vreg_disable\n");
 	vreg_disable(vreg_af_actuator);
