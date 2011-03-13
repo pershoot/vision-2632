@@ -1193,7 +1193,7 @@ static ssize_t htc_battery_charger_switch(struct device *dev,
 
 	enable = simple_strtoul(buf, NULL, 10);
 
-	if (enable > 1 || enable < 0)
+	if (enable > 1)
 		return -EINVAL;
 
 	mutex_lock(&htc_batt_info.rpc_lock);
@@ -1272,7 +1272,7 @@ htc_attrs_failed:
 		device_remove_file(dev, &htc_battery_attrs[i]);
 htc_delta_attrs_failed:
 	while (j--)
-		device_remove_file(dev, &htc_set_delta_attrs[i]);
+		device_remove_file(dev, &htc_set_delta_attrs[j]);
 succeed:
 	return rc;
 }
