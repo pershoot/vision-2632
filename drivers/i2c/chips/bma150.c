@@ -22,6 +22,9 @@
 #include <linux/delay.h>
 #include<linux/earlysuspend.h>
 
+/*#define EARLY_SUSPEND_BMA 1*/
+
+
 static struct i2c_client *this_client;
 
 struct bma150_data {
@@ -334,6 +337,8 @@ static int bma_ioctl(struct inode *inode, struct file *file, unsigned int cmd,
 	return 0;
 }
 
+#ifdef EARLY_SUSPEND_BMA
+
 static void bma150_early_suspend(struct early_suspend *handler)
 {
 	if (!atomic_read(&PhoneOn_flag)) {
@@ -346,6 +351,23 @@ static void bma150_early_resume(struct early_suspend *handler)
 {
 	BMA_set_mode(BMA_MODE_NORMAL);
 }
+
+#else /* EARLY_SUSPEND_BMA */
+
+static int bma150_suspend(struct i2c_client *client, pm_message_t mesg) 
+{ 
+        BMA_set_mode(BMA_MODE_SLEEP); 
+ 
+        return 0; 
+} 
+ 
+static int bma150_resume(struct i2c_client *client) 
+{ 
+	BMA_set_mode(BMA_MODE_NORMAL); 
+	return 0; 
+} 
+#endif /* EARLY_SUSPEND_BMA */ 
+
 static ssize_t bma150_show(struct device *dev,
 				  struct device_attribute *attr, char *buf)
 {
@@ -470,9 +492,11 @@ int bma150_probe(struct i2c_client *client, const struct i2c_device_id *id)
 		goto exit_misc_device_register_failed;
 	}
 
+#ifdef EARLY_SUSPEND_BMA
 	bma->early_suspend.suspend = bma150_early_suspend;
 	bma->early_suspend.resume = bma150_early_resume;
 	register_early_suspend(&bma->early_suspend);
+#endif
 
 	err = bma150_registerAttr();
 	if (err) {
@@ -507,6 +531,11 @@ static struct i2c_driver bma150_driver = {
 	.probe = bma150_probe,
 	.remove = bma150_remove,
 	.id_table	= bma150_id,
+
+#ifndef EARLY_SUSPEND_BMA 
+        .suspend = bma150_suspend, 
+        .resume = bma150_resume, 
+#endif 
 	.driver = {
 		   .name = BMA150_I2C_NAME,
 		   },

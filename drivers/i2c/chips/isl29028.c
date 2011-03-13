@@ -1086,7 +1086,7 @@ static ssize_t ps_enable_store(struct device *dev,
 	return count;
 }
 
-static DEVICE_ATTR(ps_adc, 0666, ps_adc_show, ps_enable_store);
+static DEVICE_ATTR(ps_adc, 0664, ps_adc_show, ps_enable_store);
 
 static ssize_t ps_kadc_show(struct device *dev,
 			struct device_attribute *attr, char *buf)
@@ -1146,7 +1146,7 @@ static ssize_t ps_kadc_store(struct device *dev,
 	return count;
 }
 
-static DEVICE_ATTR(ps_kadc, 0666, ps_kadc_show, ps_kadc_store);
+static DEVICE_ATTR(ps_kadc, 0664, ps_kadc_show, ps_kadc_store);
 
 static ssize_t ps_led_show(struct device *dev,
 			struct device_attribute *attr, char *buf)
@@ -1201,7 +1201,7 @@ static ssize_t ps_led_store(struct device *dev,
 	return count;
 }
 
-static DEVICE_ATTR(ps_led, 0666, ps_led_show, ps_led_store);
+static DEVICE_ATTR(ps_led, 0664, ps_led_show, ps_led_store);
 
 static ssize_t ls_adc_show(struct device *dev,
 				  struct device_attribute *attr, char *buf)
@@ -1225,7 +1225,7 @@ static ssize_t ls_adc_show(struct device *dev,
 	return ret;
 }
 
-static DEVICE_ATTR(ls_adc, 0666, ls_adc_show, NULL);
+static DEVICE_ATTR(ls_adc, 0664, ls_adc_show, NULL);
 
 static ssize_t ls_enable_show(struct device *dev,
 				  struct device_attribute *attr, char *buf)
@@ -1286,7 +1286,7 @@ static ssize_t ls_enable_store(struct device *dev,
 	return count;
 }
 
-static DEVICE_ATTR(ls_auto, 0666,
+static DEVICE_ATTR(ls_auto, 0664,
 	ls_enable_show, ls_enable_store);
 
 static ssize_t ls_kadc_show(struct device *dev,
@@ -1327,7 +1327,7 @@ static ssize_t ls_kadc_store(struct device *dev,
 	return count;
 }
 
-static DEVICE_ATTR(ls_kadc, 0666, ls_kadc_show, ls_kadc_store);
+static DEVICE_ATTR(ls_kadc, 0664, ls_kadc_show, ls_kadc_store);
 
 static int lightsensor_setup(struct isl29028_info *lpi)
 {

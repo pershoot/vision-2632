@@ -126,6 +126,13 @@ config HAS_WAKELOCK
 config HAS_EARLYSUSPEND
 	bool
 
+config SYS_SYNC_BLOCKING_DEBUG 
+        bool "Enable a debug timer during sys_sync" 
+        default n 
+        ---help--- 
+          Enable sys_sync blocking debug. Sys_rq will be showed in kernel 
+          log once the sys_sync time over 3 seconds. 
+
 config WAKELOCK
 	bool "Wake lock"
 	depends on PM && RTC_CLASS

@@ -958,6 +958,12 @@ struct vfe31_frame_extra {
 #define VFE_DEMUX_GAIN_0                0x00000288
 #define VFE_DEMUX_GAIN_1                0x0000028C
 #define VFE_CHROMA_UP                   0x0000035C
+#define VFE_SKIN_ENHAN_CR_COORD_0       0x00000418 
+#define VFE_SKIN_ENHAN_CB_COORD_0       0x0000042C 
+#define VFE_SKIN_ENHAN_CR_COEFF_0       0x00000440 
+#define VFE_SKIN_ENHAN_CB_COEFF_0       0x00000458 
+#define VFE_SKIN_ENHAN_CR_OFFSET_0      0x00000470 
+#define VFE_SKIN_ENHAN_CB_OFFSET_0      0x00000488 
 #define VFE_FRAMEDROP_ENC_Y_CFG         0x00000504
 #define VFE_FRAMEDROP_ENC_CBCR_CFG      0x00000508
 #define VFE_FRAMEDROP_ENC_Y_PATTERN     0x0000050C
@@ -1031,6 +1037,10 @@ struct vfe31_ctrl_type {
 	struct vfe_stats_control ihistStatsControl;
 	struct msm_camera_sensor_info *s_info;
 };
+
+#define VFE_SKIN_ENHAN_COORDINATES_LEN 5
+#define VFE_SKIN_ENHAN_COEFF_LEN  6
+#define VFE_SKIN_ENHAN_OFFSET_LEN  6
 
 #define statsAeNum      0
 #define statsAfNum      1
