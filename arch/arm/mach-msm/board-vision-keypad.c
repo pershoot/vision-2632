@@ -180,7 +180,6 @@ static struct gpio_event_direct_entry vision_keypad_input_map[] = {
 	{
 		.gpio = VISION_GPIO_KEYPAD_POWER_KEY,
 		.code = KEY_POWER,
-                .wakeup = 1,
 	},
 	{
 		.gpio = PM8058_GPIO_PM_TO_SYS(VISION_VOL_UP),
@@ -197,7 +196,6 @@ static struct gpio_event_direct_entry vision_keypad_input_map[] = {
 	{
 		.gpio = PM8058_GPIO_PM_TO_SYS(VISION_CAM_STEP2),
 		.code = KEY_CAMERA,
-                .wakeup = 1,
 	},
 	{
 		.gpio = PM8058_GPIO_PM_TO_SYS(VISION_CAM_STEP1),
