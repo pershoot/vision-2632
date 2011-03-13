@@ -226,6 +226,7 @@ static struct platform_device msm_imic_device = {
 
 static struct adie_codec_action_unit ihs_stereo_rx_48KHz_osr256_actions[] =
 	HEADSET_STEREO_RX_CAPLESS_48000_OSR_256;
+	/* HEADSET_STEREO_RX_LEGACY_48000_OSR_256; */
 
 static struct adie_codec_hwsetting_entry ihs_stereo_rx_settings[] = {
 	{
@@ -434,7 +435,7 @@ static struct adie_codec_action_unit ifmradio_speaker_osr64_actions[] =
 
 static struct adie_codec_hwsetting_entry ifmradio_speaker_settings[] = {
 	{
-		.freq_plan = 8000,
+		.freq_plan = 48000,
 		.osr = 256,
 		.actions = ifmradio_speaker_osr64_actions,
 		.action_sz = ARRAY_SIZE(ifmradio_speaker_osr64_actions),
@@ -454,7 +455,7 @@ static struct snddev_icodec_data snddev_ifmradio_speaker_data = {
 	.acdb_id = ACDB_ID_LP_FM_SPKR_PHONE_STEREO_RX,
 	.profile = &ifmradio_speaker_profile,
 	.channel_mode = 1,
-	.default_sample_rate = 8000,
+	.default_sample_rate = 48000,
 	.pamp_on = fm_speaker_enable,
 	.dev_vol_type = SNDDEV_DEV_VOL_DIGITAL,
 };
@@ -487,12 +488,12 @@ static struct snddev_icodec_data snddev_ifmradio_headset_data = {
 	.capability = (SNDDEV_CAP_RX | SNDDEV_CAP_FM),
 	.name = "fmradio_headset_rx",
 	.copp_id = 0,
-	.acdb_id = ACDB_ID_HEADSET_SPKR_STEREO,
+	.acdb_id = ACDB_ID_LP_FM_HEADSET_SPKR_STEREO_RX,
 	.profile = &ifmradio_headset_profile,
 	.channel_mode = 2,
 	.default_sample_rate = 48000,
-	/* change to raise ncp power. capless need ncp bias. */
 	.pamp_on = fm_headset_enable,
+	.dev_vol_type = SNDDEV_DEV_VOL_DIGITAL,
 };
 
 static struct platform_device msm_ifmradio_headset_device = {
