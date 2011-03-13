@@ -1192,6 +1192,12 @@ config HTC_OFFMODE_ALARM
 	help
 		support HTC offmode alarm.
 
+config HTC_QUICKBOOT_OFFMODE_ALARM
+	bool "Support HTC quickboot offmode alarm."
+	default n
+	help
+	  support HTC quickboot offmode alarm.
+
 config PROC_COMM_TIMEOUT_RESET
     bool "Enable proc_comm timeout to check modem hang"
     default n
