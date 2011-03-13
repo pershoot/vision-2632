@@ -1096,7 +1096,7 @@ config SMD_OFFSET_TCXO_STAT
 
 config SMD_OFFSET_NEGATE_CLIENT_STAT
         depends on MSM_SMD
-	hex "SMD offset of negate clinet stat"
+	hex "SMD offset of negate client stat"
         default 0x0
         help
           TCXO shutdown retry conuter and negate tcxoc client counters.
@@ -1108,13 +1108,6 @@ config AXI_SCREEN_POLICY
 	default n
 	help
 		Simple AXI scaling based on screen ON/OFF and PWRC.
-
-config SMD_OFFSET_NEGATE_CLIENT_STAT
-	depends on MSM_SMD
-	hex "SMD offset of negate clinet stat"
-	default 0x0
-	help
-	  TCXO shutdown retry conuter and negate tcxoc client counters.
 
 config MSM_NPA
 	bool "Node Power Architecture(NPA) support"
