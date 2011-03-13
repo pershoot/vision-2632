@@ -113,7 +113,7 @@ int aat1271_flashlight_control(int mode)
 		return -EIO;
 	}
 #endif
-#if 0 /* disable this for DEATH_RAY */
+#ifndef CONFIG_MSM_FLASHLIGHT_DEATH_RAY
 	if (this_fl_str->mode_status == mode) {
 		printk(KERN_INFO "%s: mode is same: %d\n",
 							FLASHLIGHT_NAME, mode);
@@ -128,7 +128,6 @@ int aat1271_flashlight_control(int mode)
 			return -EINVAL;
 	}
 #endif
-
 	spin_lock_irqsave(&this_fl_str->spin_lock,
 						this_fl_str->spinlock_flags);
 	if (this_fl_str->mode_status == FL_MODE_FLASH) {
@@ -194,6 +193,7 @@ int aat1271_flashlight_control(int mode)
 		this_fl_str->fl_lcdev.brightness = LED_HALF - 1;
 	break;
 
+#ifdef CONFIG_MSM_FLASHLIGHT_DEATH_RAY
 	case FL_MODE_DEATH_RAY:
 		pr_info("%s: death ray\n", __func__);
 		hrtimer_cancel(&this_fl_str->timer);
@@ -203,6 +203,7 @@ int aat1271_flashlight_control(int mode)
 		this_fl_str->mode_status = 0;
 		this_fl_str->fl_lcdev.brightness = 3;
 	break;
+#endif
 
 	default:
 		printk(KERN_ERR "%s: unknown flash_light flags: %d\n",
@@ -236,8 +237,10 @@ static void fl_lcdev_brightness_set(struct led_classdev *led_cdev,
 			mode = FL_MODE_TORCH_LED_A;
 		else if (brightness == 2 && fl_str->led_count)
 			mode = FL_MODE_TORCH_LED_B;
+#ifdef CONFIG_MSM_FLASHLIGHT_DEATH_RAY
 		else if (brightness == 3)
 			mode = FL_MODE_DEATH_RAY;
+#endif
 		else
 			mode = FL_MODE_TORCH;
 	} else if (brightness > LED_HALF && brightness <= LED_FULL) {
