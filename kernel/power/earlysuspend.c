@@ -86,6 +86,10 @@ void unregister_early_suspend(struct early_suspend *handler)
 }
 EXPORT_SYMBOL(unregister_early_suspend);
 
+#ifdef CONFIG_SYS_SYNC_BLOCKING_DEBUG
+void sys_sync_debug(void);
+#endif
+
 static void early_suspend(struct work_struct *work)
 {
 	struct early_suspend *pos;
@@ -124,7 +128,12 @@ static void early_suspend(struct work_struct *work)
 		pr_info("early_suspend: sync\n");
 
 	pr_info("[R] early_suspend: sync\n");
+
+#ifdef CONFIG_SYS_SYNC_BLOCKING_DEBUG
+	sys_sync_debug();
+#else
 	sys_sync();
+#endif
 abort:
 	spin_lock_irqsave(&state_lock, irqflags);
 	if (state == SUSPEND_REQUESTED_AND_SUSPENDED)

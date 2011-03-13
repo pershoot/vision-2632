@@ -15,6 +15,12 @@
 #include <linux/buffer_head.h>
 #include "internal.h"
 
+#define SYS_SYNC_TIMEOUT 3*HZ
+
+#ifdef CONFIG_SYS_SYNC_BLOCKING_DEBUG
+static int sys_sync_done;
+#endif
+
 #define VALID_FLAGS (SYNC_FILE_RANGE_WAIT_BEFORE|SYNC_FILE_RANGE_WRITE| \
 			SYNC_FILE_RANGE_WAIT_AFTER)
 
@@ -475,3 +481,25 @@ out:
 	return ret;
 }
 EXPORT_SYMBOL_GPL(do_sync_mapping_range);
+
+#ifdef CONFIG_SYS_SYNC_BLOCKING_DEBUG 
+static void sync_timeout_handler(unsigned long data) 
+{ 
+  if (sys_sync_done == 0) { 
+    pr_info("sys_sync time is too long(more than 3 seconds)"); 
+    show_state_filter(TASK_UNINTERRUPTIBLE); 
+  } 
+} 
+ 
+static DEFINE_TIMER(sys_sync_timer, sync_timeout_handler, 0, 0); 
+ 
+void sys_sync_debug(void) 
+{ 
+  mod_timer(&sys_sync_timer, jiffies + SYS_SYNC_TIMEOUT); 
+  sys_sync_done = 0; 
+  sys_sync(); 
+  sys_sync_done = 1; 
+  del_timer(&sys_sync_timer); 
+} 
+#endif 
+

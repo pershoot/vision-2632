@@ -445,7 +445,7 @@ static ssize_t attr_store(struct device *dev, struct device_attribute *attr,
 	return 0;
 }
 
-static DEVICE_ATTR(sysattr, 0666, attr_show, attr_store);
+static DEVICE_ATTR(sysattr, 0664, attr_show, attr_store);
 
 int enable_mic_bias(int on)
 {

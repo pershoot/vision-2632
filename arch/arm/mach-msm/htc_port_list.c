@@ -75,7 +75,7 @@ static ssize_t htc_store(struct device *dev, struct device_attribute *attr,  con
 	return ret;
 }
 
-static DEVICE_ATTR(flag, 0666, htc_show, htc_store);
+static DEVICE_ATTR(flag, 0664, htc_show, htc_store);
 
 static int port_list_enable(int enable) {
 	if (port_list[0] != enable) {

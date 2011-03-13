@@ -42,7 +42,7 @@ static ssize_t fm_radio_show(struct device *dev,
         return sprintf(buf, "fm_radio_status:%d\n", fm_radio_status);
 }
 
-static DEVICE_ATTR(fm_radio, 0666, fm_radio_show, fm_radio_store);
+static DEVICE_ATTR(fm_radio, 0664, fm_radio_show, fm_radio_store);
 
 struct gpio_event {
 	struct gpio_event_input_devs *input_devs;
