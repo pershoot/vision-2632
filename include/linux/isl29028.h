@@ -29,6 +29,8 @@
 #define ISL29028_PROX_DATA	0x08
 #define ISL29028_LS_DATA1	0x09
 #define ISL29028_LS_DATA2	0x0A
+#define ISL29028_TEST1		0x0E
+#define ISL29028_TEST2		0x0F
 
 #define ISL29028_PROX_EN	(1 << 7)
 #define ISL29028_PROX_DR	(1 << 3)
@@ -40,6 +42,9 @@
 #define ALS_CALIBRATED		0x6DA5
 #define PS_CALIBRATED		0x5053
 
+extern unsigned int ps_kparam1;
+extern unsigned int ps_kparam2;
+
 struct isl29028_platform_data {
 	int intr;
 	uint16_t levels[10];
@@ -48,6 +53,8 @@ struct isl29028_platform_data {
 	uint8_t lt;
 	uint8_t ht;
 	uint8_t debounce;
+	uint8_t *mapping_table;
+	uint8_t mapping_size;
 };
 
 #endif
