@@ -28,7 +28,6 @@
 
 #define DEBUG 0
 #define MAX_FAILURE_COUNT 3
-/*#define AKM_EARLY_SUSPEND 1*/
 
 #define DEVICE_ACCESSORY_ATTR(_name, _mode, _show, _store) \
 struct device_attribute dev_attr_##_name = __ATTR(_name, _mode, _show, _store)
@@ -605,7 +604,6 @@ static irqreturn_t akm8975_interrupt(int irq, void *dev_id)
 	return IRQ_HANDLED;
 }
 
-#ifdef AKM_EARLY_SUSPEND
 static void akm8975_early_suspend(struct early_suspend *handler)
 {
 	if (!atomic_read(&PhoneOn_flag)) {
@@ -628,30 +626,6 @@ static void akm8975_early_resume(struct early_suspend *handler)
 	} else
 		printk(KERN_DEBUG "AKM8975 akm8975_early_resume: PhoneOn_flag is set\n");
 }
-
-#else /* AKM_EARLY_SUSPEND */
-
-static int akm8975_suspend(struct i2c_client *client, pm_message_t mesg)
-{
-	atomic_set(&suspend_flag, 1);
-	atomic_set(&reserve_open_flag, atomic_read(&open_flag));
-	atomic_set(&open_flag, 0);
-	wake_up(&open_wq);
-	disable_irq(this_client->irq);
-
-	return 0;
-}
-
-static int akm8975_resume(struct i2c_client *client)
-{
-	enable_irq(this_client->irq);
-	atomic_set(&suspend_flag, 0);
-	atomic_set(&open_flag, atomic_read(&reserve_open_flag));
-	wake_up(&open_wq);
-
-	return 0;
-}
-#endif /* AKM_EARLY_SUSPEND */
 
 static const struct file_operations akmd_fops = {
 	.owner = THIS_MODULE,
@@ -873,11 +847,26 @@ int akm8975_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	atomic_set(&t_flag, 0);
 	atomic_set(&mv_flag, 0);
 
-#ifdef AKM_EARLY_SUSPEND
 	akm->early_suspend_akm.suspend = akm8975_early_suspend;
 	akm->early_suspend_akm.resume = akm8975_early_resume;
 	register_early_suspend(&akm->early_suspend_akm);
-#endif
+
+	/*for (i = 0; i < 5; i++) {
+		// Try to get the AKM8975 data for the first time
+		err = AKECS_SetMode(AK8975_CNTL_SNG_MEASURE);
+		if (err < 0)
+			printk(KERN_ERR "%s:[Andy] set SNG MEASURE mode"
+				" error\n", __func__);
+		printk(KERN_ERR "%s:[Andy] set SNG MEASURE mode!\n",
+			__func__);
+
+		err = AKECS_TransRBuff(msg, RBUFF_SIZE_8975);
+		if (err < 0)
+			printk(KERN_ERR "%s:[Andy] AKECS_TransRBuff error\n",
+				__func__);
+		printk(KERN_ERR "%s:[Andy] AKECS_TransRBuff!\n",
+			__func__);
+	}*/
 	err = akm8975_registerAttr(akm);
 	if (err) {
 		printk(KERN_ERR
@@ -919,11 +908,6 @@ static struct i2c_driver akm8975_driver = {
 	.probe 	= akm8975_probe,
 	.remove 	= akm8975_remove,
 	.id_table	= akm8975_id,
-
-#ifndef AKM_EARLY_SUSPEND
-	.suspend = akm8975_suspend,
-	.resume = akm8975_resume,
-#endif
 	.driver = {
 		   .name = AKM8975_I2C_NAME,
 		   },
