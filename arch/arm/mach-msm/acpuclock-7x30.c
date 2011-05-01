@@ -179,30 +179,26 @@ static struct clkctl_acpu_speed acpu_freq_tbl[] = {
 };
 static unsigned long max_axi_rate;
 
-#define POWER_COLLAPSE_HZ (MAX_AXI_KHZ * 1000)
 unsigned long acpuclk_power_collapse(int from_idle)
 {
 	int ret = acpuclk_get_rate();
-	ret *= 1000;
 	if (ret > drv_state.power_collapse_khz)
-		acpuclk_set_rate(drv_state.power_collapse_khz,
+		acpuclk_set_rate(drv_state.power_collapse_khz * 1000,
 	(from_idle ? SETRATE_PC_IDLE : SETRATE_PC));
-	return ret;
+	return ret * 1000;
 }
 
 unsigned long acpuclk_get_wfi_rate(void)
 {
-	return drv_state.wait_for_irq_khz;
+	return drv_state.wait_for_irq_khz * 1000;
 }
 
-#define WAIT_FOR_IRQ_HZ (MAX_AXI_KHZ * 1000)
 unsigned long acpuclk_wait_for_irq(void)
 {
 	int ret = acpuclk_get_rate();
-	ret *= 1000;
 	if (ret > drv_state.wait_for_irq_khz)
-		acpuclk_set_rate(drv_state.wait_for_irq_khz, SETRATE_SWFI);
-	return ret;
+		acpuclk_set_rate(drv_state.wait_for_irq_khz * 1000, SETRATE_SWFI);
+	return ret * 1000;
 }
 
 static int acpuclk_set_acpu_vdd(struct clkctl_acpu_speed *s)
